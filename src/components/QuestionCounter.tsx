@@ -1,5 +1,5 @@
 import React from 'react'
-import '../App.css'
+import '../pages/trivia-page/trivia-page.css'
 import { questionArrayList } from '../assets/questions'
 
 interface props {

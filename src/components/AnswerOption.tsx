@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import '../App.css'
+import '../pages/trivia-page/trivia-page.css'
 import { questionArrayList } from '../assets/questions'
 import { BsCheck2Circle } from "react-icons/bs";
 import { RxCross2 } from "react-icons/rx";

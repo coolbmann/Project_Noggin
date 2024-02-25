@@ -1,7 +1,7 @@
 import React from 'react'
 import '../assets/questions'
 import { questionArrayList } from '../assets/questions';
-import '../App.css'
+import '../pages/trivia-page/trivia-page.css'
 
 interface props {
   currentQuestion: number;
