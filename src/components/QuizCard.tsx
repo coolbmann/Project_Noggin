@@ -1,15 +1,30 @@
 import React from 'react'
-import '../pages/homepage/homepage.css'
+import { Link } from 'react-router-dom'
+import styles from '../pages/homepage/homepage.module.css'
 
-const QuizCard = () => {
+interface props {
+  id: number;
+  imgURL: string;
+  title: string;
+  q1: string;
+}
+
+
+const QuizCard = ({ id, imgURL, title, q1 }: props) => {
   return (
-    <div className='quiz-card'>
-      <div className='image-container'>
-        {/* <img src="https://images.unsplash.com/photo-1501426026826-31c667bdf23d?q=80&w=1636&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" /> */}
+    <Link className={styles.quizCardContainer} to={`/trivia/${id}`}>
+      <div className={styles.quizCard}>
+        <div className={styles.imageContainer}>
+          <img src={imgURL} />
+        </div>
+        <div className={styles.infoContainer}>
+          <div className={styles.quizCardTitle}>{title}</div>
+          <div className={styles.quizCardCaption}>{q1}</div>
+        </div>
 
       </div>
 
-    </div>
+    </Link>
   )
 }
 
