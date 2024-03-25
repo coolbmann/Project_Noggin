@@ -1,19 +1,18 @@
-import React from 'react'
-import { questionImageArray } from '../assets/images'
+import React from "react";
+import { questionImageArray } from "../assets/images";
 
 interface props {
-  currentQuestion: number;
+  imageURL: string;
 }
 
-const QuestionImage = ({ currentQuestion }: props): React.JSX.Element => {
-
-  const currentImage = questionImageArray[currentQuestion];
+const QuestionImage = ({ imageURL }: props): React.JSX.Element => {
+  const currentImage = imageURL;
 
   return (
-    <div className='image-container'>
-      <img className='question-image' src={currentImage.imageURL} />
+    <div className="image-container">
+      <img className="question-image" src={imageURL} />
     </div>
-  )
-}
+  );
+};
 
-export default QuestionImage
+export default QuestionImage;

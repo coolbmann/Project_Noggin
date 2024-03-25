@@ -13,8 +13,8 @@
   flex-direction: column;
   box-sizing: border-box;
   padding: 0.7rem 0.7rem;
-  width: 30rem;
-  height: 35rem;
+  width: 37.5rem;
+  height: 43.75rem;
   background-color: #ffffff;
   border-radius: 1rem;
   box-shadow: #9b9ede64 0px 15px 50px -12px;
@@ -37,7 +37,6 @@
 .question-count {
   display: flex;
   align-items: baseline;
-
 }
 
 .question-count p {
@@ -167,7 +166,6 @@
 /* Final Score Component Styles */
 
 .final-result-container {
-
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -177,7 +175,6 @@
   background-color: #ffffff;
   border-radius: 1rem;
   box-shadow: #9b9ede64 0px 15px 50px -12px;
-
 }
 
 .inner-container {

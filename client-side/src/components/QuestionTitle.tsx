@@ -1,23 +1,25 @@
-import React from 'react'
-import '../assets/questions'
-import { questionArrayList } from '../assets/questions';
-import '../pages/trivia-page/trivia-page.css'
+import React from "react";
+import "../assets/questions";
+import { questionArrayList } from "../assets/questions";
+import "../pages/trivia-page/trivia-page.css";
+import axios from "axios";
+import { useParams } from "react-router-dom";
 
 interface props {
-  currentQuestion: number;
+  quizQuestion: string;
 }
 
-const QuestionTitle = ({ currentQuestion }: props) => {
+const QuestionTitle = ({ quizQuestion }: props) => {
+  console.log(quizQuestion);
 
-  const question = questionArrayList[currentQuestion];
+  // Destructure quizId from URL params
+  const { quizId } = useParams();
 
   return (
-    <div className='question-title'>
-      <h1>
-        {question.question}
-      </h1>
+    <div className="question-title">
+      <h1>{quizQuestion}</h1>
     </div>
-  )
-}
+  );
+};
 
-export default QuestionTitle
+export default QuestionTitle;

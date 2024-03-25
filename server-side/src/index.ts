@@ -1,20 +1,39 @@
-import express from 'express';
-import http from 'http';
-import bodyparser from 'body-parser';
-import cookieparser from 'cookie-parser';
-import compression from 'compression';
-import cors from 'cors';
+import express from "express";
+import { createClient } from "@supabase/supabase-js";
+import dotenv from "dotenv";
+import cors from "cors";
+
+dotenv.config();
 
 const app = express();
 
-app.use(cors({
-    credentials: true,
-}));
+app.use(express.json());
+app.use(cors());
 
-app.use(compression());
-app.use(cookieparser());
-app.use(bodyparser.json());
+const PORT = process.env.PORT || 3001;
 
-const server = http.createServer(app);
+app.listen(PORT, () => {
+  return console.log(`Listening on Port: ${PORT}`);
+});
 
-server.listen(8080)
+const supabase = createClient(
+  process.env.PROJECT_ID || "YOUR_PROJECT_URL",
+  process.env.API_KEY || "YOUR_API_KEY"
+);
+
+// GET Current Quiz Question Data
+app.get("/api/collections/quiz/:id", async (request, response) => {
+  const { id } = request.params;
+
+  try {
+    const { data, error } = await supabase
+      .from(`quizQuestionLink`)
+      .select(
+        `*, questions(id, question, answer_options, correct_answer, imageurl)`
+      )
+      .eq("quizId", id);
+    return response.json(data);
+  } catch (error) {
+    return response.status(500);
+  }
+});
