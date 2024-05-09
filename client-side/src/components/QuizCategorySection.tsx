@@ -1,30 +1,63 @@
-import React from 'react'
-import QuizCard from './QuizCard'
-import styles from '../pages/homepage/homepage.module.css'
-import { homepageDummyData } from '../assets/homepageDummy';
+import React, { useEffect, useState } from "react";
+import QuizCard from "./QuizCard";
+import styles from "../pages/homepage/homepage.module.css";
+import { homepageDummyData } from "../assets/homepageDummy";
+import axios from "axios";
 
-const renderQuizCards = () => {
-  return (
-    homepageDummyData.map((element, index) => {
+interface props {
+  category: string;
+}
+
+interface cardData {
+  collection: string;
+  title: string;
+  quizId: number;
+  question: string;
+  question_id: number;
+  imageurl: string;
+  row_num: number;
+}
+
+const QuizCategorySection = ({ category }: props) => {
+  const [cardData, setCardData] = useState<cardData[]>([]);
+
+  useEffect(() => {
+    const getQuizCardData = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3001/api/collections/${category}`
+        );
+        console.log(response.data);
+        setCardData(response.data);
+      } catch (error) {
+        return console.log(500);
+      }
+    };
+
+    getQuizCardData();
+  }, []);
+
+  const renderQuizCards = () => {
+    return cardData.map((element, index) => {
       console.log(index);
       return (
-        <QuizCard key={index} id={element.id} imgURL={element.imgURL} title={element.title} q1={element.q1} />
-      )
-    })
-  )
+        <QuizCard
+          key={index}
+          id={element.quizId}
+          imgURL={element.imageurl}
+          title={element.title}
+          q1={element.question}
+        />
+      );
+    });
+  };
 
-}
-
-const QuizCategorySection = () => {
   return (
-    <div className={styles.sectionContainer} >
-      <h1>Daily Challenge</h1>
-      <div className={styles.sectionCarousel}>
-        {renderQuizCards()}
-      </div>
+    <div className={styles.sectionContainer}>
+      <h1>{category}</h1>
+      <div className={styles.sectionCarousel}>{renderQuizCards()}</div>
+    </div>
+  );
+};
 
-    </div >
-  )
-}
-
-export default QuizCategorySection
+export default QuizCategorySection;

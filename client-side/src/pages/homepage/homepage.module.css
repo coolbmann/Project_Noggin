@@ -1,68 +1,12 @@
 .homepage {
   display: grid;
-  grid-template-columns: 4.25rem auto;
+  grid-template-columns: 14rem auto;
   width: 100vw;
   height: 100vh;
   margin: 0;
-  background-color: #fefeff;
+  background-color: #fcfcfde6;
   overflow: auto;
-}
-
-.sidebar-container {
-  position: relative;
-}
-
-.sidebar {
-  position: fixed;
-  top: 0;
-}
-
-.sidebarList {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0;
-  padding: 0;
-  width: 4.25rem;
-  height: 100vh;
-  background-color: #565add;
-  list-style-type: none;
-}
-
-.logo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border: #fefeff;
-  border-radius: 0.55rem;
-  background-color: #fefeff;
-}
-
-.PiFramerLogoFill {
-  stroke-width: 5;
-}
-
-.sidebarList li {
-  padding: 0.625rem 0;
-}
-
-.navItemBox {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border: #fefeff;
-  border-radius: 0.55rem;
-  /* background-color: #7e75e6; */
-}
-
-.navItemBox:hover {
-  background-color: #7e75e6;
+  /* overscroll-behavior: contain; */
 }
 
 .mainContainer {
@@ -88,7 +32,7 @@
 }
 
 .sectionContainer h1 {
-  color: #2B1C50;
+  color: #2b1c50;
   margin: 2rem 0 1rem 2rem;
 }
 
@@ -108,7 +52,7 @@
   width: 22rem;
   height: 20rem;
   border-radius: 1rem;
-  box-shadow: #f9f8f8 0px 15px 60px -15px;
+  box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;
 }
 
 .imageContainer {
@@ -139,12 +83,12 @@
 .quizCardTitle {
   font-size: 1.325rem;
   font-weight: 700;
-  color: #2B1C50;
+  color: #2b1c50;
 }
 
 .quizCardCaption {
   font-size: 1.125rem;
   font-weight: 400;
-  color: #6C6684;
+  color: #6c6684;
   margin: auto 0;
 }

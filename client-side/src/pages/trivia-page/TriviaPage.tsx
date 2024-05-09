@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import QuestionImage from "../../components/QuestionImage";
 import QuestionCounter from "../../components/QuestionCounter";
 import QuestionTitle from "../../components/QuestionTitle";
@@ -7,6 +7,12 @@ import NextButton from "../../components/NextButton";
 import AnswerOptions from "../../components/AnswerOption";
 import ScoreCircularBar from "../../components/ScoreCircularBar";
 import axios from "axios";
+import {
+  Navigate,
+  redirect,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 
 interface quizQuestionData {
   id: number;
@@ -28,23 +34,60 @@ const TriviaPage = () => {
   const [answerSelected, setanswerSelected] = useState<string | null>();
   const [correctAnswerTally, setcorrectAnswerTally] = useState<number>(0);
   const [displayResult, setDisplayResult] = useState<boolean>(false);
-  const [quizDataArray, setQuizDataArrray] = useState<quizArrayData[]>([]);
+  const [quizDataArray, setQuizDataArray] = useState<quizArrayData[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
 
+  const attemptUuidRef = useRef<string>("");
+
+  const navigate = useNavigate();
+
+  const quizid = searchParams.get("quizid");
+  console.log("quizid: ", quizid);
+
+  // Load QuizData and set Attempt ID on page load
   useEffect(() => {
     const getQuizData = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:3001/api/collections/quiz/5"
-        );
-        const responseData = await response.data;
-        setQuizDataArrray(responseData);
-        console.log(responseData);
-      } catch (error) {
-        return console.log("No Data 500", error);
+      if (quizid) {
+        try {
+          const response = await axios.get(
+            `http://localhost:3001/api/collections/quiz/${quizid}`,
+            { withCredentials: true }
+          );
+          const responseData = await response.data;
+          setQuizDataArray(responseData);
+          console.log(responseData);
+        } catch (error) {
+          return console.log("No Data 500", error);
+        }
+      } else {
+        console.log("No Data 500");
+        return navigate("/homepage");
+      }
+    };
+
+    const getAttemptUUID = async () => {
+      if (!attemptUuidRef.current) {
+        try {
+          // Generate Attempt UUID from Backend
+          const response = await axios.get(
+            "http://localhost:3001/api/collections/quiz/attempt/uuid"
+          );
+          const responseData = await response.data;
+          attemptUuidRef.current = responseData;
+          console.log("attemptUUID: " + attemptUuidRef.current);
+        } catch (error) {
+          console.error(error);
+        }
       }
     };
 
     getQuizData();
+    getAttemptUUID();
+
+    return () => {
+      setQuizDataArray([]);
+      attemptUuidRef.current = "";
+    };
   }, []);
 
   const handleNextQuestion = () => {
@@ -53,8 +96,6 @@ const TriviaPage = () => {
     } else {
       setQuestionNumber((question) => question + 1);
     }
-    // % questionImageArray.length
-
     setanswerSelected(null);
     setanswerRequired(true);
   };
@@ -82,13 +123,43 @@ const TriviaPage = () => {
         console.log("check");
       }
     }
+
+    // POST attempt and quiz-question answer
+    const handleClick = async () => {
+      try {
+        await axios.post(
+          "http://localhost:3001/api/collections/quiz/attempt",
+          {
+            attemptUuid: attemptUuidRef.current,
+            quizId: quizid,
+          },
+          {
+            withCredentials: true,
+          }
+        );
+
+        await axios.post(
+          "http://localhost:3001/api/collections/quiz/question-response",
+          {
+            questionId: quizDataArray[questionNumber].questionId,
+            answerSelected: option,
+            attemptUuid: attemptUuidRef.current,
+          },
+          { withCredentials: true }
+        );
+      } catch (error) {
+        throw new Error();
+      }
+    };
+
+    handleClick();
   };
 
   // Console Log
   console.log(answerSelected);
   console.log(answerRequired);
   console.log(correctAnswerTally);
-  console.log(quizDataArray.length);
+  // console.log(`quiz array length: `, quizDataArray.length);
   console.log(questionNumber);
 
   if (quizDataArray.length > 0) {
@@ -106,7 +177,7 @@ const TriviaPage = () => {
                   {correctAnswerTally / quizDataArray.length < 0.5
                     ? "Not your best day, better luck next time!"
                     : correctAnswerTally / quizDataArray.length < 0.75
-                    ? "Close, but no cupcake"
+                    ? "Close, but no cupcake!"
                     : correctAnswerTally / quizDataArray.length < 1
                     ? "Almost there, almost a genius!"
                     : "All bow to the trivia master!"}

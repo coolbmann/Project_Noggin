@@ -1,14 +1,47 @@
-import express from "express";
+import express, {
+  NextFunction,
+  Request,
+  Response,
+  ErrorRequestHandler,
+} from "express";
 import { createClient } from "@supabase/supabase-js";
-import dotenv from "dotenv";
 import cors from "cors";
+import session, { Session, SessionData } from "express-session";
+import { validateUsername } from "./middleware/validateUsername";
+import supabase from "./config/supabaseClient";
+import usersRouter from "./routes/users";
+import quizzesRouter from "./routes/quizzes";
+import { logSession } from "./middleware/logSession";
+import { errorHandler } from "./middleware/errors";
+import { getUserOverview } from "./repositories/users";
 
-dotenv.config();
+interface mySessionData extends Session {
+  username?: string;
+}
 
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+app.use(
+  session({
+    secret: "noggin-apis",
+    saveUninitialized: true,
+    resave: false,
+    cookie: {
+      maxAge: 600000,
+    },
+  })
+);
+
+app.use(usersRouter);
+app.use(quizzesRouter);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 
@@ -16,14 +49,10 @@ app.listen(PORT, () => {
   return console.log(`Listening on Port: ${PORT}`);
 });
 
-const supabase = createClient(
-  process.env.PROJECT_ID || "YOUR_PROJECT_URL",
-  process.env.API_KEY || "YOUR_API_KEY"
-);
-
 // GET Current Quiz Question Data
 app.get("/api/collections/quiz/:id", async (request, response) => {
   const { id } = request.params;
+  const sessionId = request.session.id;
 
   try {
     const { data, error } = await supabase
@@ -36,4 +65,31 @@ app.get("/api/collections/quiz/:id", async (request, response) => {
   } catch (error) {
     return response.status(500);
   }
+});
+
+// GET Quiz Card Data
+app.get("/api/collections/:category", async (request, response) => {
+  const { category } = request.params;
+
+  try {
+    const { data, error } = await supabase
+      .from(`quiz_card`)
+      .select("*")
+      .filter("row_num", "eq", 1)
+      .filter("collection", "eq", category);
+    return response.json(data);
+  } catch (error) {
+    return response.status(500);
+  }
+});
+
+// GET Username (Session ID)
+app.get("/api/username", validateUsername, (request, response) => {
+  const sessionData = request.session as mySessionData;
+  return response.send(sessionData.username);
+});
+
+app.get("/api/user/userid", async (request, response) => {
+  // const data = await getUserOverview();
+  response.send(request.sessionID);
 });

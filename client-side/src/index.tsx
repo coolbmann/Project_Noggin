@@ -14,6 +14,7 @@ import {
 } from "react-router-dom";
 import HomePage from "./pages/homepage/HomePage";
 import TriviaPage from "./pages/trivia-page/TriviaPage";
+import Leaderboard from "./pages/leaderboard/Leaderboard";
 
 // interface RouteObject {
 //   caseSensitive?: boolean;
@@ -28,8 +29,8 @@ const router = createBrowserRouter(
     <Route path="/" element={<App />}>
       <Route path="" element={<HomePage />} />
       <Route path="homepage" element={<HomePage />} />
-      <Route path="trivia" element={<HomePage />} />
-      <Route path="trivia/:quizId" element={<TriviaPage />} />
+      <Route path="trivia" element={<TriviaPage />} />
+      <Route path="leaderboard" element={<Leaderboard />} />
     </Route>
   )
 );

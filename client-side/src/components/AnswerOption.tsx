@@ -4,6 +4,8 @@ import { questionArrayList } from "../assets/questions";
 import { BsCheck2Circle } from "react-icons/bs";
 import { RxCross2 } from "react-icons/rx";
 import { count } from "console";
+import axios from "axios";
+import { useSearchParams } from "react-router-dom";
 
 interface props {
   answerOptions: string[];
@@ -11,7 +13,6 @@ interface props {
   answerRequired: boolean;
   submit: (option: string) => void;
   answerSelected?: string | null;
-  // tallyCount: (tally: number) => void;
 }
 
 const AnswerOptions = ({
@@ -68,7 +69,9 @@ const AnswerOptions = ({
                 className="answer-option"
                 key={index}
                 disabled={!answerRequired}
-                onClick={() => submit(option)}
+                onClick={() => {
+                  submit(option);
+                }}
               >
                 {option}
               </button>
