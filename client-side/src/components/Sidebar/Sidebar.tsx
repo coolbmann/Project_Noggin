@@ -46,7 +46,7 @@ const Sidebar = () => {
             </Link>
           </li>
           <li>
-            <Link to="/trivia" className={activeNavItem(["/trivia"])}>
+            <Link to="/create-quiz" className={activeNavItem(["/create-quiz"])}>
               <div className={styles.menu}>
                 <LuPlusCircle size={16} />
                 <p>Create</p>

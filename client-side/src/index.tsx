@@ -15,6 +15,7 @@ import {
 import HomePage from "./pages/homepage/HomePage";
 import TriviaPage from "./pages/trivia-page/TriviaPage";
 import Leaderboard from "./pages/leaderboard/Leaderboard";
+import CreateQuiz from "./pages/create-quiz/CreateQuiz";
 
 // interface RouteObject {
 //   caseSensitive?: boolean;
@@ -31,6 +32,7 @@ const router = createBrowserRouter(
       <Route path="homepage" element={<HomePage />} />
       <Route path="trivia" element={<TriviaPage />} />
       <Route path="leaderboard" element={<Leaderboard />} />
+      <Route path="create-quiz" element={<CreateQuiz />} />
     </Route>
   )
 );

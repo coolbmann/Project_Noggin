@@ -57,7 +57,7 @@ const AttemptTile = ({
           </div>
         </div>
       </div>
-      <Accordion>
+      <Accordion headerContent="See attempt details">
         <div style={{ paddingLeft: "1.5rem", paddingRight: "1.5rem" }}>
           <table className={userDetailsStyles.responseTable}>
             <thead>
