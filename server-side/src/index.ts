@@ -26,7 +26,7 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://noggin-api.onrender.com",
+    origin: "https://noggin.onrender.com",
     credentials: true,
   })
 );
