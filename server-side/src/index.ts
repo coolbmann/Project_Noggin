@@ -41,7 +41,7 @@ app.use(
       // httpOnly: true,
       maxAge: 86400000,
       // sameSite: "lax",
-      secure: false,
+      secure: true,
       // domain: "https://noggin.onrender.com/",
     },
   })
