@@ -23,7 +23,6 @@ interface mySessionData extends Session {
 
 const app = express();
 
-app.set("trust proxy", 1);
 app.use(express.json());
 app.use(
   cors({
@@ -45,9 +44,10 @@ app.use(
     saveUninitialized: true,
     resave: false,
     cookie: {
-      httpOnly: true,
+      // httpOnly: true,
       maxAge: 86400000,
-      sameSite: "lax",
+      // sameSite: "lax",
+      secure: false,
       domain: "https://noggin.onrender.com/",
     },
   })
