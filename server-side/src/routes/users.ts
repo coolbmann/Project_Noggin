@@ -1,5 +1,5 @@
-import { Router, request, response } from "express";
-import { createUser, getUserOverview } from "../repositories/users";
+import { Router, Request, Response, response } from "express";
+import { createUser, getTopUser, getUserOverview } from "../repositories/users";
 import { validateUsername } from "../middleware/validateUsername";
 import { getAttemptDetails } from "../repositories/quizzes";
 
@@ -18,6 +18,15 @@ router.get("/api/user/overview/attempts", async (request, response) => {
 
 router.get("/api/user/userid", async (request, response) => {
   response.send(request.sessionID);
+});
+
+router.get("/api/user/topuser", async (req: Request, res: Response) => {
+  try {
+    const response = await getTopUser();
+    res.send(response[0].username);
+  } catch (error) {
+    res.status(500).send("Error in fetching data");
+  }
 });
 
 export default router;

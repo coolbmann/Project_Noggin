@@ -6,6 +6,7 @@ import "./trivia-page.css";
 import NextButton from "../../components/NextButton";
 import AnswerOptions from "../../components/AnswerOption";
 import ScoreCircularBar from "../../components/ScoreCircularBar";
+import { IoArrowBackOutline } from "react-icons/io5";
 import axios from "axios";
 import {
   Navigate,
@@ -13,6 +14,8 @@ import {
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
+import { Link } from "react-router-dom";
+import config from "../../config/config";
 
 interface quizQuestionData {
   id: number;
@@ -25,6 +28,7 @@ interface quizQuestionData {
 interface quizArrayData {
   quizId: number;
   questionId: number;
+  order: number;
   questions: quizQuestionData;
 }
 
@@ -50,11 +54,14 @@ const TriviaPage = () => {
       if (quizid) {
         try {
           const response = await axios.get(
-            `http://localhost:3001/api/collections/quiz/${quizid}`,
+            `${config.api.baseURL}/collections/quiz/${quizid}`,
             { withCredentials: true }
           );
-          const responseData = await response.data;
-          setQuizDataArray(responseData);
+          const responseData = (await response.data) as quizArrayData[];
+          const sortedResponseData = responseData.sort((a, b) => {
+            return a.order - b.order;
+          });
+          setQuizDataArray(sortedResponseData);
           console.log(responseData);
         } catch (error) {
           return console.log("No Data 500", error);
@@ -70,7 +77,7 @@ const TriviaPage = () => {
         try {
           // Generate Attempt UUID from Backend
           const response = await axios.get(
-            "http://localhost:3001/api/collections/quiz/attempt/uuid"
+            `${config.api.baseURL}/collections/quiz/attempt/uuid`
           );
           const responseData = await response.data;
           attemptUuidRef.current = responseData;
@@ -128,7 +135,7 @@ const TriviaPage = () => {
     const handleClick = async () => {
       try {
         await axios.post(
-          "http://localhost:3001/api/collections/quiz/attempt",
+          `${config.api.baseURL}/collections/quiz/attempt`,
           {
             attemptUuid: attemptUuidRef.current,
             quizId: quizid,
@@ -139,7 +146,7 @@ const TriviaPage = () => {
         );
 
         await axios.post(
-          "http://localhost:3001/api/collections/quiz/question-response",
+          `${config.api.baseURL}/collections/quiz/question-response`,
           {
             questionId: quizDataArray[questionNumber].questionId,
             answerSelected: option,
@@ -148,7 +155,8 @@ const TriviaPage = () => {
           { withCredentials: true }
         );
       } catch (error) {
-        throw new Error();
+        console.error(error);
+        throw Error;
       }
     };
 
@@ -165,6 +173,11 @@ const TriviaPage = () => {
   if (quizDataArray.length > 0) {
     return (
       <div className="trivia-page">
+        <Link to="/homepage">
+          <button className="backButton">
+            <IoArrowBackOutline />
+          </button>
+        </Link>
         {displayResult ? (
           <div className="final-result-container">
             <div className="inner-container">

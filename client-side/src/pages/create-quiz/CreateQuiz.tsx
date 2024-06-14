@@ -4,13 +4,28 @@ import Header from "../../components/Header/Header";
 import styles from "./createQuiz.module.css";
 import Tooltip from "../../components/Tooltip/Tooltip";
 import Avatar from "../../assets/icons/profileAvatar.png";
+import EmptyState from "../../assets/icons/Empty State Illustration.svg";
 import { FaRegTrashCan } from "react-icons/fa6";
-import Accordion from "../../components/UserDetails/Accordion";
 import InputDropDown from "../../components/InputDropdown/InputDropDown";
 import CustomQuizCard from "../../components/DraggableQuizComponent/CustomQuizCard";
-import { set } from "date-fns";
-import { randomUUID } from "crypto";
 import { ToWords } from "to-words";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import axios from "axios";
+import Toast from "../../components/Toast/Toast";
+import config from "../../config/config";
 
 interface submittedQuestionsProps {
   question: string;
@@ -20,7 +35,15 @@ interface submittedQuestionsProps {
   key: string;
 }
 
+interface customQuizProps {
+  quiz: { key: string; title: string };
+  questions: submittedQuestionsProps[];
+}
+
 const CreateQuiz = () => {
+  // Define quiz data formatted for API
+  const [customQuizData, setCustomQuizData] = useState<customQuizProps>();
+
   // Define quiz questions object array
   const [submittedQuestions, setSubmittedQuestions] = useState<
     submittedQuestionsProps[]
@@ -37,17 +60,33 @@ const CreateQuiz = () => {
 
   // Button states
   const [saveButtonActive, setSaveButtonActive] = useState(false);
-  const [createQuizButtonActive, setCreatequizButtonActive] = useState(false);
+  const [createQuizButtonActive, setCreateQuizButtonActive] = useState(false);
 
   // State to track current question in editor
   const [activeQuestion, setActiveQuestion] = useState<string | null>(null);
 
+  // Toast
+  const [successToastVisible, setSuccessToastVisible] =
+    useState<boolean>(false);
+  const [failToastVisible, setFailToastVisible] = useState<boolean>(false);
+
   const questionObject = {} as submittedQuestionsProps;
   const toWords = new ToWords();
 
-  // Function to check if all fields are valid
+  // Sortable
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Enable / Disable button states
   const checkFormFieldsValid = () => {
-    setSaveButtonActive(question !== "" && correctAnswer !== "");
+    setSaveButtonActive(question !== "" && correctAnswer !== ""); // Check if form fields are valid to add question
+    setCreateQuizButtonActive(
+      submittedQuestions.length > 0 && quizTitle !== ""
+    ); // Check at least one question is submitted
   };
 
   const saveQuestion = (
@@ -69,7 +108,8 @@ const CreateQuiz = () => {
         const prevArray = submittedQuestions.filter(
           (question) => question.key !== activeQuestion
         );
-        return [...prevArray, questionObject];
+        const newArray = [...prevArray, questionObject];
+        return newArray.sort((a, b) => a.order - b.order);
       });
     } else {
       questionObject.order = submittedQuestions.length;
@@ -118,6 +158,7 @@ const CreateQuiz = () => {
                       idx === index ? e.target.value : item
                     )
                   );
+                  setCorrectAnswer("");
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
@@ -164,7 +205,8 @@ const CreateQuiz = () => {
         {submittedQuestions.map((item) => {
           return (
             <CustomQuizCard
-              key={item.order}
+              key={item.key}
+              itemKey={item.key}
               selected={activeQuestion === item.key ? true : false}
               order={item.order}
               title={item.question}
@@ -181,15 +223,70 @@ const CreateQuiz = () => {
     );
   };
 
+  const handleDragEnd = (event: any) => {
+    console.log("Drag end called");
+    console.log(typeof event);
+    const { active, over } = event;
+    console.log("ACTIVE" + active.id);
+    console.log("OVER" + over.id);
+
+    if (active.id !== over.id) {
+      setSubmittedQuestions((items) => {
+        // Reorder array for UI
+        const activeIndex = items.findIndex((item) => item.key === active.id);
+        const overIndex = items.findIndex((item) => item.key === over.id);
+
+        const sortedArray = arrayMove(items, activeIndex, overIndex);
+        // Update order value
+        return sortedArray.map((item, index) => {
+          return { ...item, order: index };
+        });
+      });
+    }
+  };
+
+  const formatQuizData = () => {
+    setCustomQuizData({
+      quiz: { key: crypto.randomUUID(), title: quizTitle },
+      questions: submittedQuestions,
+    });
+  };
+
+  // Axios Call to DB
+  const postQuiz = async () => {
+    try {
+      const { data, status } = await axios.post(
+        `${config.api.baseURL}/collections/create-quiz`,
+        customQuizData
+      );
+      if (status === 200) {
+        setSuccessToastVisible(true);
+        setSubmittedQuestions([]);
+        setQuestion("");
+        setAnswerOptions([]);
+        setCurrentAnswerOption("");
+        setCorrectAnswer("");
+        setActiveQuestion(null);
+        setQuizTitle("");
+      } else {
+        setFailToastVisible(true);
+      }
+    } catch (error) {
+      setFailToastVisible(true);
+    }
+  };
+
   useEffect(() => {
     console.log(submittedQuestions);
     console.log("Active Question: " + activeQuestion);
     renderQuestionPreviewCards();
-  }, [submittedQuestions, activeQuestion]);
+    checkFormFieldsValid();
+    formatQuizData();
+  }, [submittedQuestions, activeQuestion, quizTitle]);
 
   useEffect(() => {
     checkFormFieldsValid();
-  }, [question, correctAnswer]);
+  }, [question, correctAnswer, quizTitle]);
 
   return (
     <div
@@ -204,7 +301,69 @@ const CreateQuiz = () => {
         <Header />
         <div className={styles.mainContainer}>
           <div className={styles.quizPreviewContainer}>
-            {renderQuestionPreviewCards()}
+            {submittedQuestions.length > 0 ? (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={submittedQuestions.map((item) => item.key)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {renderQuestionPreviewCards()}
+                </SortableContext>
+              </DndContext>
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingBottom: "35%",
+                  paddingLeft: "1.5rem",
+                  height: "100%",
+                  gap: "1rem",
+                }}
+              >
+                <div>
+                  <img src={EmptyState} alt="Empty State" />
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <h1
+                    style={{
+                      fontSize: "1.25rem",
+                      fontWeight: "600",
+                      marginBottom: "1rem",
+                    }}
+                  >
+                    No Questions Added to Quiz
+                  </h1>
+                  <p
+                    style={{
+                      textAlign: "center",
+                      fontSize: "0.825rem",
+                      padding: "0 0.5rem",
+                    }}
+                  >
+                    Add questions and answers through the editor to see them
+                    here.
+                    <br />
+                    <br />
+                    You can re-order and edit questions once they’ve been saved,
+                    by clicking, and dragging-and-dropping the cards.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
           <div className={styles.editorContainer}>
             <div style={{ width: "100%", position: "absolute", top: "-4rem" }}>
@@ -245,6 +404,10 @@ const CreateQuiz = () => {
                   <input
                     type="text"
                     placeholder="Give this quiz a title"
+                    value={quizTitle}
+                    onChange={(e) => {
+                      setQuizTitle(e.target.value);
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.currentTarget.blur();
@@ -313,6 +476,36 @@ const CreateQuiz = () => {
               </div>
               <div className={styles.inputFooter}>
                 <button
+                  style={
+                    activeQuestion === null
+                      ? { display: "none" }
+                      : {
+                          marginRight: "auto",
+                          backgroundColor: "transparent",
+                          borderColor: "#ff4d4d",
+                          color: "#ff4d4d",
+                        }
+                  }
+                  className={styles.saveButton}
+                  onClick={() => {
+                    setSubmittedQuestions((prevArray) => {
+                      const newArray = prevArray
+                        .filter((question) => question.key !== activeQuestion)
+                        .map((element, idx) => {
+                          return { ...element, order: idx };
+                        });
+                      return newArray;
+                    });
+                    setQuestion("");
+                    setAnswerOptions([]);
+                    setCurrentAnswerOption("");
+                    setCorrectAnswer("");
+                    setActiveQuestion(null);
+                  }}
+                >
+                  Delete Question
+                </button>
+                <button
                   disabled={!saveButtonActive}
                   className={styles.saveButton}
                   onClick={() => {
@@ -340,7 +533,34 @@ const CreateQuiz = () => {
             </div>
           </div>
         </div>
+        <div className={styles.footer}>
+          <button
+            className={styles.createQuizButton}
+            disabled={!createQuizButtonActive}
+            onClick={() => {
+              postQuiz();
+            }}
+          >
+            Create Quiz
+          </button>
+        </div>
       </div>
+      {successToastVisible ? (
+        <Toast
+          heading="Woohoo!"
+          caption="Check out your quiz in the homepage!"
+          animationEnd={() => setSuccessToastVisible(false)}
+          type="green"
+        />
+      ) : null}
+      {failToastVisible ? (
+        <Toast
+          heading="Uh oh..."
+          caption="Try again at a different time"
+          animationEnd={() => setFailToastVisible(false)}
+          type="red"
+        />
+      ) : null}
     </div>
   );
 };

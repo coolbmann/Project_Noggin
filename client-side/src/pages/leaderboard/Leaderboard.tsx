@@ -1,7 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  RefObject,
+  createRef,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import styles from "./leaderboard.module.css";
-import { Link } from "react-router-dom";
+import { Link, redirectDocument } from "react-router-dom";
 import { FaChevronLeft } from "react-icons/fa6";
 import LeaderboardRow from "../../components/LeaderboardRow";
 import LeaderboardSpacerRow from "../../components/LeaderboardSpacerRow";
@@ -9,6 +15,7 @@ import UserDetailsPanel from "../../components/UserDetails/UserDetailsPanel";
 import axios from "axios";
 import Toast from "../../components/Toast/Toast";
 import Header from "../../components/Header/Header";
+import config from "../../config/config";
 
 interface userOverview {
   id: string;
@@ -30,6 +37,7 @@ interface userAttemptDetails {
   answer_selected: string;
   correct_answer: string;
   totalPoints: number;
+  order: number;
 }
 
 const Leaderboard = () => {
@@ -46,7 +54,7 @@ const Leaderboard = () => {
     const getLeaderboardData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3001/api/user/overview",
+          `${config.api.baseURL}/user/overview`,
           {
             withCredentials: true,
           }
@@ -62,7 +70,7 @@ const Leaderboard = () => {
     const getUserAttemptDetails = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3001/api/user/overview/attempts",
+          `${config.api.baseURL}/user/overview/attempts`,
           {
             withCredentials: true,
           }
@@ -77,12 +85,9 @@ const Leaderboard = () => {
 
     const getUserId = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3001/api/user/userid",
-          {
-            withCredentials: true,
-          }
-        );
+        const response = await axios.get(`${config.api.baseURL}/user/userid`, {
+          withCredentials: true,
+        });
         const responseData = await response.data;
         setCurrentUserId(await responseData);
       } catch (error) {}
@@ -97,7 +102,20 @@ const Leaderboard = () => {
     // console.log(userAttemptDetails);
   }, [selectedUser, userAttemptDetails]);
 
+  const rowRefs = leaderboardData.reduce((acc, value) => {
+    acc[value.id] = React.createRef();
+    return acc;
+  }, {} as { [key: string]: RefObject<HTMLTableRowElement> });
+
   const jumpToProfileClick = () => {
+    // Function to scroll to row based on current user key
+    const scrollToRow = (id: string) => {
+      rowRefs[id].current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    };
+
     if (
       leaderboardData.some((data) => {
         return data.id === currentUserId;
@@ -105,6 +123,7 @@ const Leaderboard = () => {
     ) {
       setSelectedUser(currentUserId);
       setSidepanelVisible(true);
+      scrollToRow(currentUserId);
     } else {
       setToastVisible(true);
     }
@@ -174,7 +193,7 @@ const Leaderboard = () => {
                     style={{
                       position: "sticky",
                       top: "0",
-                      backgroundColor: "#FFFFFF",
+                      backgroundColor: "#fefeff",
                     }}
                   >
                     <tr>
@@ -192,6 +211,7 @@ const Leaderboard = () => {
                     {leaderboardData.map((user, index) => {
                       return (
                         <LeaderboardRow
+                          rowRef={rowRefs[user.id]}
                           key={user.id}
                           userId={user.id}
                           rank={index + 1}
@@ -226,6 +246,7 @@ const Leaderboard = () => {
           heading="Just a heads up..."
           caption="You haven't done any quizzes!"
           animationEnd={() => setToastVisible(false)}
+          type="orange"
         />
       ) : null}
     </div>

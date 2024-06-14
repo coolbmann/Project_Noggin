@@ -1,3 +1,4 @@
+import { RefObject } from "react";
 import LeaderboardSpacerRow from "./LeaderboardSpacerRow";
 
 interface props {
@@ -9,6 +10,7 @@ interface props {
   showDetails: () => void;
   userId: string;
   selectedUser: string;
+  rowRef: RefObject<HTMLTableRowElement>;
 }
 
 const LeaderboardRow = ({
@@ -20,10 +22,12 @@ const LeaderboardRow = ({
   showDetails,
   userId,
   selectedUser,
+  rowRef,
 }: props) => {
   return (
     <>
       <tr
+        ref={rowRef}
         style={selectedUser === userId ? { backgroundColor: "#F0F1FF" } : {}}
         onClick={showDetails}
       >

@@ -11,6 +11,7 @@ const getUser = async () => {
   }
 };
 
+// POST new User record
 const createUser = async (id: string, username: string) => {
   const timestamp = new Date();
   const formattedTimestamp = timestamp.toISOString();
@@ -30,6 +31,7 @@ const createUser = async (id: string, username: string) => {
   }
 };
 
+// GET User attempt records
 const getUserOverview = async () => {
   try {
     const { data, error } = await supabase.from("userOverview").select();
@@ -41,4 +43,22 @@ const getUserOverview = async () => {
   } catch (error) {}
 };
 
-export { getUser, createUser, getUserOverview };
+// GET top user
+const getTopUser = async () => {
+  try {
+    const { data, error } = await supabase
+      .from("userOverview")
+      .select("username")
+      .order("totalPoints", { ascending: false })
+      .limit(1);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { getUser, createUser, getUserOverview, getTopUser };

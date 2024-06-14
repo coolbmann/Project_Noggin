@@ -24,6 +24,7 @@ interface userAttemptDetails {
   answer_selected: string;
   correct_answer: string;
   totalPoints: number;
+  order: number;
 }
 
 const UserDetailsPanel = ({
@@ -50,6 +51,12 @@ const UserDetailsPanel = ({
     return uniqueAttemptIds.map((attempt, index) => {
       const attemptResponseData = selectedUserData.filter((item) => {
         return item.attemptId === uniqueAttemptIds[index];
+      });
+
+      const sortedAttemptResponseData = attemptResponseData.sort((a, b) => {
+        if (a.order === null) return 1;
+        if (b.order === null) return 1;
+        return a.order - b.order;
       });
 
       return (
@@ -112,13 +119,24 @@ const UserDetailsPanel = ({
                     textAlign: "left",
                     paddingLeft: "1.5rem",
                     fontWeight: "700",
+                    fontSize: "0.875rem",
                   }}
                 >
                   Quiz
                 </div>
-                <div style={{ fontWeight: "700" }}>Attempted At</div>
-                <div style={{ fontWeight: "700" }}>Score</div>
-                <div style={{ paddingRight: "1.5rem", fontWeight: "700" }}>
+                <div style={{ fontWeight: "700", fontSize: "0.875rem" }}>
+                  Attempted At
+                </div>
+                <div style={{ fontWeight: "700", fontSize: "0.875rem" }}>
+                  Score
+                </div>
+                <div
+                  style={{
+                    paddingRight: "1.5rem",
+                    fontWeight: "700",
+                    fontSize: "0.875rem",
+                  }}
+                >
                   Total Points
                 </div>
               </div>

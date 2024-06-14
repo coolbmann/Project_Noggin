@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: center;
   gap: 5%;
-  height: calc(100vh - 89px);
+  height: calc(100vh - 146px);
   padding-top: 2rem;
 }
 
@@ -13,8 +13,9 @@
   height: 85%;
   background-color: #fff;
   border-radius: 0.5rem;
-  box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px,
-    rgba(17, 17, 26, 0.1) 0px 0px 8px;
+  /* box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px,
+    rgba(17, 17, 26, 0.1) 0px 0px 8px; */
+  border: 1px solid #e2e2e2;
 }
 
 .editorInputContainer {
@@ -162,15 +163,42 @@ button:hover {
   flex: none;
   width: 25rem;
   height: 85%;
-  box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px,
-    rgba(17, 17, 26, 0.1) 0px 0px 8px;
+  /* box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px,
+    rgba(17, 17, 26, 0.1) 0px 0px 8px; */
   background-color: #fff;
   border-radius: 0.5rem;
   padding: 2rem 1.5rem 2rem 0rem;
   box-sizing: border-box;
   overflow: auto;
+  border: 1px solid #e2e2e2;
 }
 
 .quizPreviewContainer::-webkit-scrollbar {
   display: none;
+}
+
+.footer {
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  padding-right: 2rem;
+  border-top: 1px solid #e8e8e8;
+  background-color: #fefefe;
+}
+
+/* Footer */
+
+.createQuizButton {
+  color: #fff;
+  background-color: #565add;
+}
+
+.createQuizButton:enabled {
+  background-color: #373bac;
+}
+
+.createQuizButton:disabled {
+  color: #fff;
+  background-color: #565bdd89;
 }

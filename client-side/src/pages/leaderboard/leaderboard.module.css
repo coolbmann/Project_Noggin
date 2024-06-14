@@ -10,6 +10,7 @@
 
 .mainContainer {
   grid-column-start: 2;
+  background-color: #fcfcfe;
 }
 
 .mainContainerBody {
@@ -143,10 +144,14 @@
 
 .leaderboardTable thead {
   font-weight: 600;
+  font-size: 0.875rem;
 }
 
 .leaderboardTable thead td:last-child {
   padding: 1rem 2.25% 1rem 0;
+}
+.leaderboardTable thead td {
+  background-color: #fcfcfe;
 }
 
 .leaderboardTable tbody tr {
