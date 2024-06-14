@@ -3,6 +3,7 @@ import QuizCard from "./QuizCard";
 import styles from "../pages/homepage/homepage.module.css";
 import { homepageDummyData } from "../assets/homepageDummy";
 import axios from "axios";
+import config from "../config/config";
 
 interface props {
   category: string;
@@ -25,7 +26,7 @@ const QuizCategorySection = ({ category }: props) => {
     const getQuizCardData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3001/api/collections/${category}`
+          `${config.api.baseURL}/collections/${category}`
         );
         console.log(response.data);
         setCardData(response.data);

@@ -7,7 +7,9 @@ const errorHandler = (
   response: Response,
   next: NextFunction
 ) => {
-  response.status(500).send({ errors: [{ message: error }] });
+  console.log(error);
+
+  response.status(500).send({ errors: [{ message: error.message }] });
 };
 
 export { errorHandler };

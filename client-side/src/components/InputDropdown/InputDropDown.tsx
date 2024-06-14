@@ -40,6 +40,7 @@ const InputDropDown = ({ options, handleSelection, value }: props) => {
         <input
           type="text"
           placeholder="Select the correct answer from the dropdown"
+          readOnly
           value={value}
           onClick={() => setIsOpen(!isOpen)}
           onFocus={(e) => e.currentTarget.blur()}

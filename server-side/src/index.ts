@@ -14,6 +14,7 @@ import quizzesRouter from "./routes/quizzes";
 import { logSession } from "./middleware/logSession";
 import { errorHandler } from "./middleware/errors";
 import { getUserOverview } from "./repositories/users";
+import config from "../src/config/config";
 
 interface mySessionData extends Session {
   username?: string;
@@ -24,7 +25,15 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      if (config.allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
@@ -34,7 +43,7 @@ app.use(
     saveUninitialized: true,
     resave: false,
     cookie: {
-      maxAge: 600000,
+      maxAge: 86400000,
     },
   })
 );
@@ -52,8 +61,8 @@ app.listen(PORT, () => {
 // GET Current Quiz Question Data
 app.get("/api/collections/quiz/:id", async (request, response) => {
   const { id } = request.params;
-  const sessionId = request.session.id;
 
+  // Not a good implementation, define in repositories folder
   try {
     const { data, error } = await supabase
       .from(`quizQuestionLink`)
@@ -75,7 +84,7 @@ app.get("/api/collections/:category", async (request, response) => {
     const { data, error } = await supabase
       .from(`quiz_card`)
       .select("*")
-      .filter("row_num", "eq", 1)
+      .filter("row_num", "eq", 0)
       .filter("collection", "eq", category);
     return response.json(data);
   } catch (error) {

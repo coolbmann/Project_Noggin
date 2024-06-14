@@ -1,11 +1,6 @@
-import React, { useState } from "react";
 import "../pages/trivia-page/trivia-page.css";
-import { questionArrayList } from "../assets/questions";
 import { BsCheck2Circle } from "react-icons/bs";
 import { RxCross2 } from "react-icons/rx";
-import { count } from "console";
-import axios from "axios";
-import { useSearchParams } from "react-router-dom";
 
 interface props {
   answerOptions: string[];
