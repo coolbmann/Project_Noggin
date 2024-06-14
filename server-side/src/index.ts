@@ -15,6 +15,7 @@ import { logSession } from "./middleware/logSession";
 import { errorHandler } from "./middleware/errors";
 import { getUserOverview } from "./repositories/users";
 import config from "../src/config/config";
+import path from "path";
 
 interface mySessionData extends Session {
   username?: string;
@@ -43,7 +44,10 @@ app.use(
     saveUninitialized: true,
     resave: false,
     cookie: {
+      httpOnly: true,
       maxAge: 86400000,
+      sameSite: "lax",
+      domain: "https://noggin.onrender.com/",
     },
   })
 );
@@ -53,6 +57,14 @@ app.use(quizzesRouter);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
+
+// Serve static files from the React app's build directory
+app.use(express.static(path.join(__dirname, "build")));
+
+// Serve index.html for all other routes (SPA fallback)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
 
 app.listen(PORT, () => {
   return console.log(`Listening on Port: ${PORT}`);
