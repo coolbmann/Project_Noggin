@@ -26,15 +26,7 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-      if (config.allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: "https://noggin-api.onrender.com",
     credentials: true,
   })
 );
@@ -48,7 +40,7 @@ app.use(
       maxAge: 86400000,
       // sameSite: "lax",
       secure: false,
-      domain: "https://noggin.onrender.com/",
+      // domain: "https://noggin.onrender.com/",
     },
   })
 );
