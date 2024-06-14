@@ -58,14 +58,6 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 
-// Serve static files from the React app's build directory
-app.use(express.static(path.join(__dirname, "build")));
-
-// Serve index.html for all other routes (SPA fallback)
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
-});
-
 app.listen(PORT, () => {
   return console.log(`Listening on Port: ${PORT}`);
 });
