@@ -44,6 +44,7 @@ app.use(
       // httpOnly: true,
       maxAge: 86400000,
       secure: true,
+      domain: "https://noggin.onrender.com",
     },
     store: new MemoryStoreConstructor({
       checkPeriod: 86400000,
