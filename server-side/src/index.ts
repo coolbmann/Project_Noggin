@@ -44,10 +44,6 @@ app.use(
       // httpOnly: true,
       maxAge: 86400000,
       secure: true,
-      domain:
-        process.env.NODE_ENV === "production"
-          ? "https://noggin.onrender.com"
-          : undefined,
     },
     store: new MemoryStoreConstructor({
       checkPeriod: 86400000,
