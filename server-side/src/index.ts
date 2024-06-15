@@ -1,25 +1,21 @@
-import express, {
-  NextFunction,
-  Request,
-  Response,
-  ErrorRequestHandler,
-} from "express";
-import { createClient } from "@supabase/supabase-js";
+import express from "express";
 import cors from "cors";
 import session, { Session, SessionData } from "express-session";
 import { validateUsername } from "./middleware/validateUsername";
 import supabase from "./config/supabaseClient";
 import usersRouter from "./routes/users";
 import quizzesRouter from "./routes/quizzes";
-import { logSession } from "./middleware/logSession";
 import { errorHandler } from "./middleware/errors";
-import { getUserOverview } from "./repositories/users";
 import config from "../src/config/config";
-import path from "path";
+import dotenv from "dotenv";
 
 interface mySessionData extends Session {
   username?: string;
 }
+
+dotenv.config();
+
+console.log("session secret is: " + process.env.SESSION_SECRET);
 
 const app = express();
 
@@ -28,21 +24,30 @@ app.set("trust proxy", 1);
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://noggin.onrender.com",
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (config.allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
 app.use(
   session({
-    secret: "noggin-apis",
+    secret: process.env.SESSION_SECRET || "",
     saveUninitialized: true,
     resave: false,
     cookie: {
-      // httpOnly: true,
+      httpOnly: true,
       maxAge: 86400000,
-      // sameSite: "lax",
       secure: true,
-      // domain: "https://noggin.onrender.com/",
+      domain:
+        process.env.NODE_ENV === "production"
+          ? "https://noggin.onrender.com"
+          : undefined,
     },
   })
 );
