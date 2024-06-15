@@ -7,13 +7,13 @@ import usersRouter from "./routes/users";
 import quizzesRouter from "./routes/quizzes";
 import { errorHandler } from "./middleware/errors";
 import config from "../src/config/config";
-import dotenv from "dotenv";
+import MemoryStore from "memorystore";
 
 interface mySessionData extends Session {
   username?: string;
 }
 
-dotenv.config();
+const MemoryStoreConstructor = MemoryStore(session);
 
 console.log("session secret is: " + process.env.SESSION_SECRET);
 
@@ -41,14 +41,17 @@ app.use(
     saveUninitialized: true,
     resave: false,
     cookie: {
-      httpOnly: true,
+      // httpOnly: true,
       maxAge: 86400000,
-      secure: true,
+      // secure: true,
       domain:
         process.env.NODE_ENV === "production"
           ? "https://noggin.onrender.com"
           : undefined,
     },
+    store: new MemoryStoreConstructor({
+      checkPeriod: 86400000,
+    }),
   })
 );
 
