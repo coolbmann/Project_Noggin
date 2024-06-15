@@ -43,7 +43,7 @@ app.use(
     cookie: {
       // httpOnly: true,
       maxAge: 86400000,
-      // secure: true,
+      secure: true,
       domain:
         process.env.NODE_ENV === "production"
           ? "https://noggin.onrender.com"
