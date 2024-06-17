@@ -41,7 +41,7 @@ app.use(
     saveUninitialized: true,
     resave: false,
     cookie: {
-      // httpOnly: true,
+      httpOnly: true,
       maxAge: 86400000,
       secure: true,
       domain:
