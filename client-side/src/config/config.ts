@@ -1,7 +1,7 @@
 const config = {
   api: {
     // baseURL: "http://localhost:3001/api",
-    baseURL: "https://noggin-api.onrender.com/api",
+    baseURL: "https://noggin-api.bryanherijanto.com/api",
   },
 };
 
