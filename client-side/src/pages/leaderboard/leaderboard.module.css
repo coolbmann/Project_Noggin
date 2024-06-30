@@ -169,6 +169,7 @@
   grid-column-start: 2;
   border-left: 1px solid #6c668533;
   transition: all 0.3s;
+  background-color: #fefefe;
 }
 
 .navHeader {
