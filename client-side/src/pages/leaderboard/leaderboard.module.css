@@ -109,7 +109,6 @@
 .leaderboardTable tbody td {
   border: 1px solid #6c668533; /* Applies border */
   font-size: 0.875rem;
-  background-color: #fcfcfe;
 }
 
 .leaderboardTable tbody td:nth-child(1) {

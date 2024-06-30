@@ -109,7 +109,6 @@ const UserDetailsPanel = ({
                 className={userDetailsStyles.titlesLayout}
                 style={{
                   paddingBottom: "1rem",
-                  backgroundColor: "#ffffff",
                   position: "sticky",
                   top: "0",
                 }}
